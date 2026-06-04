@@ -1,0 +1,54 @@
+<div class="view-container fade-in">
+  
+  <div class="register-header-actions">
+    <a class="back-link" (click)="volver()">← Volver a mis cursos</a>
+  </div>
+
+  <div class="register-topbar">
+    <div class="register-titles">
+      <h2>Planilla de Calificaciones</h2>
+      <p>Curso: <strong class="text-highlight">{{ idCurso }}</strong> • Semestre 1</p>
+    </div>
+    <div class="register-controls">
+      <button class="btn-primary" (click)="guardarNotas()">Guardar Cambios</button>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th width="5%">N°</th>
+          <th width="35%">ALUMNO</th>
+          <th width="15%" class="text-center">NOTA 1</th>
+          <th width="15%" class="text-center">NOTA 2</th>
+          <th width="15%" class="text-center">NOTA 3</th>
+          <th width="15%" class="text-center">PROMEDIO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alumno of alumnos; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td class="student-name">{{ alumno.nombre }}</td>
+          
+          <td class="text-center">
+            <input type="number" step="0.1" min="1.0" max="7.0" class="grade-input" [(ngModel)]="alumno.n1">
+          </td>
+          <td class="text-center">
+            <input type="number" step="0.1" min="1.0" max="7.0" class="grade-input" [(ngModel)]="alumno.n2">
+          </td>
+          <td class="text-center">
+            <input type="number" step="0.1" min="1.0" max="7.0" class="grade-input" [(ngModel)]="alumno.n3">
+          </td>
+          
+          <td class="text-center">
+            <span class="average-badge" [ngClass]="{'rojo': calcularPromedio(alumno) < '4.0' && calcularPromedio(alumno) !== '-'}">
+              {{ calcularPromedio(alumno) }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

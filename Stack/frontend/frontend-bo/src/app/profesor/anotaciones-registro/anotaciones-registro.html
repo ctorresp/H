@@ -1,0 +1,90 @@
+<div class="view-container fade-in">
+  
+  <div class="register-topbar">
+    <a class="back-link" (click)="volver()">← Volver a mis cursos</a>
+    <div class="register-titles">
+      <h2>Anotaciones</h2>
+      <p>Curso: {{ idCurso }} • Matemáticas</p>
+    </div>
+  </div>
+
+  <div class="split-layout">
+    
+    <div class="left-panel content-card">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar alumno...">
+      </div>
+
+      <div class="students-list">
+        <div class="student-item" *ngFor="let alumno of alumnos" 
+             [class.active]="alumnoSeleccionado?.id === alumno.id"
+             (click)="seleccionarAlumno(alumno)">
+          <span>{{ alumno.nombre }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel content-card">
+      
+      <div class="empty-state" *ngIf="!alumnoSeleccionado">
+        <div class="empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h3>Selecciona un Alumno</h3>
+        <p>Haz clic en un alumno de la lista para ver su historial de conducta o registrar una nueva observación.</p>
+      </div>
+
+      <div class="active-state fade-in" *ngIf="alumnoSeleccionado">
+        
+        <div class="student-header">
+          <div class="student-avatar">{{ alumnoSeleccionado.inicial }}</div>
+          <div>
+            <h3>{{ alumnoSeleccionado.nombre }}</h3>
+            <p>Historial y nueva anotación</p>
+          </div>
+        </div>
+
+        <div class="action-split">
+          
+          <div class="form-section">
+            <span class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> NUEVA ANOTACIÓN</span>
+            
+            <div class="type-toggle">
+              <button [class.active-pos]="tipoAnotacion === 'positiva'" (click)="setTipoAnotacion('positiva')">Positiva</button>
+              <button [class.active-neg]="tipoAnotacion === 'negativa'" (click)="setTipoAnotacion('negativa')">Negativa</button>
+            </div>
+
+            <textarea placeholder="Detalle el motivo de la anotación..." [(ngModel)]="textoAnotacion"></textarea>
+            
+            <button class="btn-submit" (click)="guardarAnotacion()" [disabled]="!textoAnotacion.trim()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Guardar Anotación
+            </button>
+          </div>
+
+          <div class="history-section">
+            <span class="section-label">HISTORIAL RECIENTE</span>
+            
+            <div class="history-list">
+              <div class="history-card" *ngFor="let nota of alumnoSeleccionado.anotaciones" [ngClass]="nota.tipo">
+                <div class="history-header">
+                  <span class="badge">{{ nota.tipo | uppercase }}</span>
+                  <span class="date">{{ nota.fecha }}</span>
+                </div>
+                <p>{{ nota.texto }}</p>
+              </div>
+              
+              <div *ngIf="alumnoSeleccionado.anotaciones.length === 0" style="color: #94a3b8; font-size: 0.9rem; text-align: center; margin-top: 2rem;">
+                No hay anotaciones recientes.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

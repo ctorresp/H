@@ -1,0 +1,9 @@
+# Contexto de build = raíz del repo (ver Contenedores/docker-compose.yml)
+.git
+**/.git
+
+Stack/Backend/target
+**/*.jar.original
+
+# JAR copiado para uso local (no hace falta en la imagen)
+Contenedores/Contenedor - ms_auth/*.jar
