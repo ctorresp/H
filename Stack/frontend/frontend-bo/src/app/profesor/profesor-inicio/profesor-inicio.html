@@ -1,5 +1,5 @@
 <div class="fade-in" style="padding-top: 1rem;">
-  
+
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-icon box-light">
@@ -7,8 +7,8 @@
       </div>
       <div class="stat-info">
         <span class="stat-label">Clases de Hoy</span>
-        <h3>4 Bloques</h3>
-        <span class="stat-sub">PRÓXIMO: 1° MEDIO A (10:00)</span>
+        <h3>{{ clasesHoyLabel() }}</h3>
+        <span class="stat-sub">{{ proximaClaseLabel() }}</span>
       </div>
     </div>
 
@@ -18,7 +18,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-label">Mensajes Nuevos</span>
-        <h3>1</h3>
+        <h3>{{ mensajesNuevos() }}</h3>
         <span class="stat-sub">DE: APODERADOS</span>
       </div>
     </div>
@@ -29,74 +29,66 @@
       </div>
       <div class="stat-info">
         <span class="stat-label">Asistencia Promedio</span>
-        <h3>94%</h3>
-        <span class="stat-sub">SEMANA ACTUAL</span>
+        <h3>{{ asistenciaPct() }}</h3>
+        <span class="stat-sub">{{ asistenciaSub() }}</span>
       </div>
     </div>
   </div>
 
   <div class="main-grid" style="margin-top: 1.5rem;">
-    
+
     <div class="content-card">
       <div class="card-header">
         <h4>Horario de Clases (Hoy)</h4>
-        <a href="#" class="link-action">Ver completo</a>
+        <a routerLink="/profesor/horario" class="link-action">Ver completo</a>
       </div>
-      
-      <div class="schedule-list">
-        
-        <div class="schedule-item completed">
-          <div class="time">08:15 - 09:45</div>
-          <div class="class-details">
-            <h5>2° Medio A - Matemáticas</h5>
-            <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg> Sala 12</span>
-          </div>
-          <div class="status-badge badge-gray">COMPLETADA</div>
-        </div>
 
-        <div class="schedule-item active">
-          <div class="time">10:00 - 11:30</div>
-          <div class="class-details">
-            <h5>1° Medio A - Matemáticas</h5>
-            <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg> Sala 14</span>
-          </div>
-          <div class="status-badge badge-dark">EN CURSO</div>
+      @if (cargando()) {
+        <p style="color:#64748b;">Cargando horario…</p>
+      } @else if (!esHoyLectivo()) {
+        <p style="color:#64748b;">Hoy no hay clases (fin de semana o feriado).</p>
+      } @else if (clasesHoy().length === 0) {
+        <p style="color:#64748b;">No tiene bloques asignados para hoy.</p>
+      } @else {
+        <div class="schedule-list">
+          @for (clase of clasesHoy(); track clase.cursoId + '-' + clase.inicio) {
+            <div class="schedule-item" [class]="claseCssEstado(clase.estado)">
+              <div class="time">{{ clase.inicio }} - {{ clase.fin }}</div>
+              <div class="class-details">
+                <h5>{{ clase.cursoNombre }} - {{ clase.asignaturaNombre }}</h5>
+                <span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                  {{ clase.sala }}
+                </span>
+              </div>
+              <div class="status-badge" [class]="badgeCssEstado(clase.estado)">{{ etiquetaEstado(clase.estado) }}</div>
+            </div>
+          }
         </div>
-
-        <div class="schedule-item pending">
-          <div class="time">11:45 - 13:15</div>
-          <div class="class-details">
-            <h5>3° Medio B - Física</h5>
-            <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg> Laboratorio 2</span>
-          </div>
-          <div class="status-badge badge-light">PENDIENTE</div>
-        </div>
-
-      </div>
+      }
     </div>
 
     <div class="content-card">
       <div class="card-header">
         <h4>Recordatorios</h4>
       </div>
-      
-      <div class="reminders-list">
-        <div class="reminder-item">
-          <div class="dot dot-red"></div>
-          <div class="reminder-content">
-            <h5>Cierre de Notas Semestre 1</h5>
-            <span>Viernes 14 de Julio</span>
-          </div>
+
+      @if (recordatorios().length === 0) {
+        <p style="color:#64748b;font-size:0.9rem;">Sin avisos institucionales. Los recordatorios administrativos aparecerán aquí cuando estén disponibles.</p>
+      } @else {
+        <div class="reminders-list">
+          @for (r of recordatorios(); track r.id) {
+            <div class="reminder-item">
+              <div class="dot" [class.dot-red]="!r.leida" [class.dot-yellow]="r.leida"></div>
+              <div class="reminder-content">
+                <h5>{{ r.titulo }}</h5>
+                <span>{{ r.cuerpo }}</span>
+                <small style="display:block;color:#94a3b8;margin-top:0.25rem;">{{ r.creadoEn | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+            </div>
+          }
         </div>
-        
-        <div class="reminder-item">
-          <div class="dot dot-yellow"></div>
-          <div class="reminder-content">
-            <h5>Reunión de Apoderados</h5>
-            <span>Jueves 13 de Julio, 19:00 hrs</span>
-          </div>
-        </div>
-      </div>
+      }
     </div>
 
   </div>

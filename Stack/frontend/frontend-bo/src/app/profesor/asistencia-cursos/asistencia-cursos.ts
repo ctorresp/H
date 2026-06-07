@@ -1,27 +1,68 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
+import { DocenteApiService } from '../../core/services/docente-api.service';
+import { CursoCard, mapAsignaciones } from '../../core/utils/asignacion.util';
 
 @Component({
   selector: 'app-asistencia-cursos',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './asistencia-cursos.html', // Asegúrate de que coincida con tu nombre de archivo
-  styleUrl: './asistencia-cursos.css'
+  templateUrl: './asistencia-cursos.html',
+  styleUrl: './asistencia-cursos.css',
 })
-export class AsistenciaCursos {
-  
-  // Estos datos en el futuro vendrán de tu Microservicio (Backend)
-  cursosAsistencia = [
-    { id: 1, grado: '1° Medio A', asignatura: 'Matemáticas', alumnos: 35, badge: '1MA' },
-    { id: 2, grado: '2° Medio A', asignatura: 'Matemáticas', alumnos: 32, badge: '2MA' },
-    { id: 3, grado: '3° Medio B', asignatura: 'Plan Diferenciado Matemáticas', alumnos: 28, badge: '3MB' }
-  ];
+export class AsistenciaCursos implements OnInit {
+  private readonly api = inject(DocenteApiService);
+  private readonly router = inject(Router);
 
-  constructor(private router: Router) {}
+  readonly cursosAsistencia = signal<CursoCard[]>([]);
+  readonly cargando = signal(true);
+  readonly error = signal('');
 
-  abrirRegistro(idCurso: string) {
-    // Esto te enviará a la ruta: /profesor/asistencia-registro/1MA
-    this.router.navigate(['/profesor/asistencia-registro', idCurso]);
+  ngOnInit(): void {
+    this.api
+      .misAsignaciones()
+      .pipe(finalize(() => this.cargando.set(false)))
+      .subscribe({
+        next: (data) => {
+          this.cursosAsistencia.set(mapAsignaciones(data));
+          this.enriquecerConteoAlumnos();
+        },
+        error: () => {
+          this.error.set(
+            'No se pudieron cargar sus cursos. Verifique que su cuenta tenga permisos de docente.',
+          );
+        },
+      });
+  }
+
+  private enriquecerConteoAlumnos(): void {
+    for (const curso of this.cursosAsistencia()) {
+      this.api.listaAlumnos(curso.cursoId, curso.asignaturaId).subscribe({
+        next: (alumnos) => {
+          this.cursosAsistencia.update((lista) =>
+            lista.map((c) =>
+              c.cursoId === curso.cursoId && c.asignaturaId === curso.asignaturaId
+                ? { ...c, alumnos: String(alumnos.length) }
+                : c,
+            ),
+          );
+        },
+        error: () => {
+          this.cursosAsistencia.update((lista) =>
+            lista.map((c) =>
+              c.cursoId === curso.cursoId && c.asignaturaId === curso.asignaturaId
+                ? { ...c, alumnos: '—' }
+                : c,
+            ),
+          );
+        },
+      });
+    }
+  }
+
+  abrirRegistro(idCurso: string): void {
+    void this.router.navigate(['/profesor/asistencia-registro', idCurso]);
   }
 }
