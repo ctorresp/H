@@ -5,7 +5,8 @@
 #   cd H/Contenedores
 #   docker compose up -d --build
 #
-# Acceso: http://127.0.0.1:4200 (frontend nginx — frontend-bo del repo GitHub)
+# Acceso: http://127.0.0.1:8050 (frontend nginx — frontend-bo del repo GitHub)
+# APIs: 8051 (auth) … 8056 (mensajería)
 
 x-logging: &default-logging
   driver: json-file
@@ -56,8 +57,9 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "8081:8081"
+      - "8051:8051"
     environment:
+      SERVER_PORT: 8051
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_usuarios?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
@@ -66,13 +68,13 @@ services:
       APP_ADMIN_ENABLED: "true"
       APP_ADMIN_EMAIL: "${APP_ADMIN_EMAIL:-admin@boh.cl}"
       APP_ADMIN_PASSWORD: "${APP_ADMIN_PASSWORD:-Admin123!}"
-      MS_ADMINISTRACION_BASE_URL: http://admin-api:8082
+      MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
     depends_on:
       mysql:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8081/actuator/health | grep -q UP"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8051/actuator/health | grep -q UP"]
     deploy:
       resources:
         limits:
@@ -90,13 +92,14 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "8082:8082"
+      - "8052:8052"
     environment:
+      SERVER_PORT: 8052
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_administracion?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
-      MS_AUTH_BASE_URL: http://auth-api:8081
+      MS_AUTH_BASE_URL: http://auth-api:8051
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
     depends_on:
       mysql:
@@ -105,7 +108,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8082/actuator/health | grep -q UP"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8052/actuator/health | grep -q UP"]
     deploy:
       resources:
         limits:
@@ -123,15 +126,16 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "8083:8083"
+      - "8053:8053"
     environment:
+      SERVER_PORT: 8053
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_academico?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
-      MS_ADMINISTRACION_BASE_URL: http://admin-api:8082
-      MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8086
+      MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
+      MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8056
     depends_on:
       mysql:
         condition: service_healthy
@@ -139,7 +143,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8083/actuator/health | grep -q UP"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8053/actuator/health | grep -q UP"]
     deploy:
       resources:
         limits:
@@ -157,15 +161,16 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "8084:8084"
+      - "8054:8054"
     environment:
+      SERVER_PORT: 8054
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_asistencia?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
-      MS_ADMINISTRACION_BASE_URL: http://admin-api:8082
-      MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8086
+      MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
+      MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8056
     depends_on:
       mysql:
         condition: service_healthy
@@ -173,7 +178,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8084/actuator/health | grep -q UP"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8054/actuator/health | grep -q UP"]
     deploy:
       resources:
         limits:
@@ -191,16 +196,17 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "8085:8085"
+      - "8055:8055"
     environment:
+      SERVER_PORT: 8055
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_conducta?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
-      MS_ADMINISTRACION_BASE_URL: http://admin-api:8082
-      MS_AUTENTICACION_BASE_URL: http://auth-api:8081
-      MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8086
+      MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
+      MS_AUTENTICACION_BASE_URL: http://auth-api:8051
+      MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8056
     depends_on:
       mysql:
         condition: service_healthy
@@ -212,7 +218,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8085/actuator/health | grep -q UP"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8055/actuator/health | grep -q UP"]
     deploy:
       resources:
         limits:
@@ -230,15 +236,16 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "8086:8086"
+      - "8056:8056"
     environment:
+      SERVER_PORT: 8056
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_mensajeria?useSSL=false&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
-      MS_ADMINISTRACION_BASE_URL: http://admin-api:8082
-      MS_AUTH_BASE_URL: http://auth-api:8081
+      MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
+      MS_AUTH_BASE_URL: http://auth-api:8051
     depends_on:
       mysql:
         condition: service_healthy
@@ -248,7 +255,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8086/actuator/health | grep -q UP"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8056/actuator/health | grep -q UP"]
     deploy:
       resources:
         limits:
@@ -266,7 +273,7 @@ services:
     restart: unless-stopped
     logging: *default-logging
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-4200}:80"
+      - "127.0.0.1:${FRONTEND_PORT:-8050}:80"
     depends_on:
       auth-api:
         condition: service_healthy

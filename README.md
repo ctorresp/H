@@ -18,7 +18,7 @@ Cumple controles de **JWT**, **auditoría de eventos** (trazabilidad Ley 21.719 
      ▼                       ▼                       ▼
 ┌─────────┐           ┌─────────────┐          ┌────────────┐
 │ Login   │◄─────────►│Administración│◄────────►│ Mensajería │
-│ :8081   │  internal │   :8082     │ internal │   :8086    │
+│ :8051   │  internal │   :8052     │ internal │   :8056    │
 └────┬────┘           └──────┬──────┘          └────────────┘
      │                       │
      │                  permisos/JWT
@@ -27,7 +27,7 @@ Cumple controles de **JWT**, **auditoría de eventos** (trazabilidad Ley 21.719 
      │              ▼                 ▼
      │        ┌──────────┐      ┌────────────┐
      │        │ Académico│      │ Asistencia │
-     │        │  :8083   │      │   :8084    │
+     │        │  :8053   │      │   :8054    │
      │        └──────────┘      └────────────┘
      │
      ▼
@@ -61,11 +61,12 @@ Cumple controles de **JWT**, **auditoría de eventos** (trazabilidad Ley 21.719 
 
 | # | Servicio | Módulo Maven | Puerto | Base de datos |
 |---|----------|--------------|--------|---------------|
-| 1 | **Login** | `ms-autenticacion` | 8081 | `db_usuarios` |
-| 2 | **Administración** | `ms-administracion` | 8082 | `db_administracion` |
-| 3 | **Cursos / Notas** | `ms-academico` | 8083 | `db_academico` |
-| 4 | **Asistencia** | `ms-asistencia` | 8084 | `db_asistencia` |
-| 5 | **Mensajería** | `ms-mensajeria` | 8086 | `db_mensajeria` |
+| 1 | **Login** | `ms-autenticacion` | 8051 | `db_usuarios` |
+| 2 | **Administración** | `ms-administracion` | 8052 | `db_administracion` |
+| 3 | **Cursos / Notas** | `ms-academico` | 8053 | `db_academico` |
+| 4 | **Asistencia** | `ms-asistencia` | 8054 | `db_asistencia` |
+| 5 | **Conducta** | `ms-conducta` | 8055 | `db_conducta` |
+| 6 | **Mensajería** | `ms-mensajeria` | 8056 | `db_mensajeria` |
 
 > El catálogo de **cursos y asignaturas** vive en **Administración**. **Académico** gestiona solo **calificaciones**.
 
@@ -285,7 +286,7 @@ Authorization: Bearer <JWT>
 
 ### Desarrollo local (sin Docker frontend)
 
-Requiere los microservicios levantados (Docker o APIs en 8081–8086).
+Requiere los microservicios levantados (Docker o APIs en 8051–8056).
 
 ```powershell
 cd "H\Stack\frontend\frontend-bo"
@@ -293,7 +294,7 @@ npm.cmd install
 npm.cmd start
 ```
 
-Abre **http://127.0.0.1:4200** — el proxy en `proxy.conf.json` redirige a los microservicios en `127.0.0.1`.
+Abre **http://127.0.0.1:8050** — el proxy en `proxy.conf.json` redirige a los microservicios en `127.0.0.1`.
 
 ### Credenciales demo
 
@@ -309,7 +310,7 @@ Abre **http://127.0.0.1:4200** — el proxy en `proxy.conf.json` redirige a los 
 
 - Docker Desktop 4.x+ (Compose V2)
 - 4 GB RAM libres recomendados
-- Puertos: `4200` (frontend), `8081–8084`, `8086`, `3307` (MySQL)
+- Puertos: `8050` (frontend), `8051–8056` (APIs), `3307` (MySQL)
 
 ### Paso a paso
 
@@ -337,15 +338,15 @@ Use **127.0.0.1** (no `localhost`) para evitar problemas de resolución en Windo
 
 | Servicio | URL |
 |----------|-----|
-| **Aplicación completa (frontend-bo)** | http://127.0.0.1:4200 |
-| Auth API directa | http://127.0.0.1:8081 |
+| **Aplicación completa (frontend-bo)** | http://127.0.0.1:8050 |
+| Auth API directa | http://127.0.0.1:8051 |
 | MySQL | `127.0.0.1:3307` (root / ver `.env`) |
 
 Verificación rápida:
 
 ```powershell
-curl.exe -s http://127.0.0.1:4200/ | findstr "Libro de Clases"
-curl.exe -s -X POST http://127.0.0.1:4200/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@boh.cl\",\"contrasena\":\"Admin123!\"}"
+curl.exe -s http://127.0.0.1:8050/ | findstr "Libro de Clases"
+curl.exe -s -X POST http://127.0.0.1:8050/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@boh.cl\",\"contrasena\":\"Admin123!\"}"
 ```
 
 El contenedor **frontend** (nginx) actúa como **reverse proxy** del SPA hacia los 5 microservicios (`nginx.conf`).

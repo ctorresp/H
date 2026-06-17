@@ -23,6 +23,6 @@ USER gea
 
 COPY --from=builder /build/ms-autenticacion/target/auth.jar ./app.jar
 
-EXPOSE 8081
+EXPOSE 8051
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

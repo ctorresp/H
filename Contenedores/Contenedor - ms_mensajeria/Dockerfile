@@ -15,5 +15,5 @@ RUN apt-get update \
 	&& addgroup --system gea && adduser --system --ingroup gea gea
 USER gea
 COPY --from=builder /build/ms-mensajeria/target/ms-mensajeria.jar ./app.jar
-EXPOSE 8086
+EXPOSE 8056
 ENTRYPOINT ["java", "-jar", "app.jar"]

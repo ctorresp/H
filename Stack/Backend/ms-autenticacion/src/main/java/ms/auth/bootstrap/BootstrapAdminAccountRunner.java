@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  * Activar solo donde corresponda ({@code app.admin.enabled=true}); en producción usar secretos reales.
  */
 @Component
+@Order(10)
 @ConditionalOnProperty(name = "app.admin.enabled", havingValue = "true")
 public class BootstrapAdminAccountRunner implements ApplicationRunner {
 

@@ -15,5 +15,5 @@ RUN apt-get update \
 	&& addgroup --system gea && adduser --system --ingroup gea gea
 USER gea
 COPY --from=builder /build/ms-academico/target/ms-academico.jar ./app.jar
-EXPOSE 8083
+EXPOSE 8053
 ENTRYPOINT ["java", "-jar", "app.jar"]

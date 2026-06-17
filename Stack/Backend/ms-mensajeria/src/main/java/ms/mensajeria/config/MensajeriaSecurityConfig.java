@@ -1,5 +1,6 @@
 package ms.mensajeria.config;
 
+import ms.common.openapi.SwaggerSecurityPaths;
 import ms.common.security.JwtAuthenticationFilter;
 import ms.common.security.JwtTokenParser;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ public class MensajeriaSecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests(auth -> auth
+						.requestMatchers(SwaggerSecurityPaths.PUBLIC).permitAll()
 						.requestMatchers("/actuator/**").permitAll()
 						.requestMatchers("/internal/**").permitAll()
 						.anyRequest().authenticated());

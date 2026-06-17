@@ -15,5 +15,5 @@ RUN apt-get update \
 	&& addgroup --system gea && adduser --system --ingroup gea gea
 USER gea
 COPY --from=builder /build/ms-asistencia/target/ms-asistencia.jar ./app.jar
-EXPOSE 8084
+EXPOSE 8054
 ENTRYPOINT ["java", "-jar", "app.jar"]

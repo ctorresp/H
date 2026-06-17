@@ -1,5 +1,6 @@
 package ms.auth.Config;
 
+import ms.common.openapi.SwaggerSecurityPaths;
 import ms.common.security.JwtAuthenticationFilter;
 import ms.common.security.JwtTokenParser;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +33,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(java.util.Arrays.asList("http://localhost:8081", "http://localhost:3000", "*"));
+		configuration.setAllowedOrigins(java.util.Arrays.asList("http://localhost:8051", "http://localhost:3000", "*"));
 		configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
 		configuration.setAllowCredentials(false);
@@ -50,6 +51,7 @@ public class SecurityConfig {
 				.csrf(AbstractHttpConfigurer::disable)
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				.authorizeHttpRequests(auth -> auth
+						.requestMatchers(SwaggerSecurityPaths.PUBLIC).permitAll()
 						.requestMatchers("/auth/login").permitAll()
 						.requestMatchers("/auth/registrar").denyAll()
 						.requestMatchers("/internal/**").permitAll()

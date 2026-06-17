@@ -4,7 +4,7 @@ Aplicación Angular 19 con patrón **Container / Presentational** (ej. `features
 
 ## Desarrollo local
 
-1. Levanta los microservicios (Docker Compose en `H/Contenedores`) en puertos **8081–8086**.
+1. Levanta los microservicios (Docker Compose en `H/Contenedores`) en puertos **8051–8056**.
 2. En esta carpeta:
 
 ```powershell
@@ -12,7 +12,7 @@ npm.cmd install
 npm.cmd start
 ```
 
-Abre **http://127.0.0.1:4200/** (proxy hacia los MS en `proxy.conf.json`).
+Abre **http://127.0.0.1:8050/** (proxy hacia los MS en `proxy.conf.json`).
 
 ## Cuentas
 

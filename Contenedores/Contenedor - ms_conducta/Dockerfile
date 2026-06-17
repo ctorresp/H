@@ -15,5 +15,5 @@ RUN apt-get update \
 	&& addgroup --system gea && adduser --system --ingroup gea gea
 USER gea
 COPY --from=builder /build/ms-conducta/target/ms-conducta.jar ./app.jar
-EXPOSE 8085
+EXPOSE 8055
 ENTRYPOINT ["java", "-jar", "app.jar"]

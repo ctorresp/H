@@ -6,13 +6,21 @@ import ms.administracion.repo.AsignaturaRepository;
 import ms.administracion.repo.CursoRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Catálogo inicial: 1ro básico → 4to medio y las 4 asignaturas del colegio.
+ * Debe ejecutarse antes que {@link DemoColegioDataInitializer} (@Order 1).
  */
 @Component
+@Order(1)
 public class CatalogoColegioInitializer implements ApplicationRunner {
+
+	private static final Logger log = LoggerFactory.getLogger(CatalogoColegioInitializer.class);
 
 	private final CursoRepository cursoRepository;
 	private final AsignaturaRepository asignaturaRepository;
@@ -51,6 +59,7 @@ public class CatalogoColegioInitializer implements ApplicationRunner {
 			crearAsignatura("CSN", "Ciencias Naturales");
 			crearAsignatura("EF", "Educación Física");
 		}
+		log.info("Catálogo listo: {} cursos, {} asignaturas", cursoRepository.count(), asignaturaRepository.count());
 	}
 
 	private void crearAsignatura(String codigo, String nombre) {

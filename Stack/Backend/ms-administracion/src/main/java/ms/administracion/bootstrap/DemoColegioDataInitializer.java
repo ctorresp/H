@@ -66,7 +66,13 @@ public class DemoColegioDataInitializer implements ApplicationRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(DemoColegioDataInitializer.class);
 
+	private static final int CATALOG_WAIT_ATTEMPTS = 15;
 
+	private static final long CATALOG_WAIT_MS = 500;
+
+	private static final int AUTH_PROFESOR_ATTEMPTS = 12;
+
+	private static final long AUTH_PROFESOR_WAIT_MS = 2_000;
 
 	private static final List<String> CODIGOS_MEDIA = List.of("MED1", "MED2", "MED3", "MED4");
 
@@ -256,6 +262,14 @@ public class DemoColegioDataInitializer implements ApplicationRunner {
 
 	public void run(ApplicationArguments args) {
 
+		if (!esperarCatalogoListo()) {
+
+			log.warn("Demo: catálogo incompleto tras {} intentos; no se cargan alumnos demo", CATALOG_WAIT_ATTEMPTS);
+
+			return;
+
+		}
+
 		Optional<Asignatura> matOpt = asignaturaRepository.findAll().stream()
 
 				.filter(a -> "MAT".equalsIgnoreCase(a.getCodigo()))
@@ -263,6 +277,8 @@ public class DemoColegioDataInitializer implements ApplicationRunner {
 				.findFirst();
 
 		if (matOpt.isEmpty()) {
+
+			log.warn("Demo: asignatura MAT no encontrada");
 
 			return;
 
@@ -280,23 +296,21 @@ public class DemoColegioDataInitializer implements ApplicationRunner {
 
 		if (cursosMedio.isEmpty()) {
 
+			log.warn("Demo: no hay cursos de enseñanza media (MED1–MED4)");
+
 			return;
 
 		}
-
-
 
 		Long profesorId = resolverProfesorDemo();
 
 		if (profesorId == null) {
 
-			log.warn("Demo: no se pudo resolver profesor {}", demoProfesorEmail);
+			log.warn("Demo: no se pudo resolver profesor {} tras reintentos", demoProfesorEmail);
 
 			return;
 
 		}
-
-
 
 		for (Curso curso : cursosMedio) {
 
@@ -313,6 +327,52 @@ public class DemoColegioDataInitializer implements ApplicationRunner {
 		}
 
 		log.info("Demo: {} cursos de media con {} alumnos únicos y apoderado c/u", cursosMedio.size(), alumnosPorCurso);
+
+	}
+
+	private boolean esperarCatalogoListo() {
+
+		for (int intento = 0; intento < CATALOG_WAIT_ATTEMPTS; intento++) {
+
+			boolean tieneMat = asignaturaRepository.findAll().stream()
+
+					.anyMatch(a -> "MAT".equalsIgnoreCase(a.getCodigo()));
+
+			boolean tieneMedios = CODIGOS_MEDIA.stream()
+
+					.allMatch(cod -> cursoRepository.findByCodigo(cod).isPresent());
+
+			if (tieneMat && tieneMedios) {
+
+				return true;
+
+			}
+
+			if (intento + 1 < CATALOG_WAIT_ATTEMPTS) {
+
+				log.debug("Demo: esperando catálogo (intento {}/{})", intento + 1, CATALOG_WAIT_ATTEMPTS);
+
+				dormir(CATALOG_WAIT_MS);
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	private static void dormir(long millis) {
+
+		try {
+
+			Thread.sleep(millis);
+
+		} catch (InterruptedException ex) {
+
+			Thread.currentThread().interrupt();
+
+		}
 
 	}
 
@@ -510,25 +570,53 @@ public class DemoColegioDataInitializer implements ApplicationRunner {
 
 	private Long resolverProfesorDemo() {
 
-		Long existente = authUsuarioClient.buscarIdPorEmail(demoProfesorEmail);
+		for (int intento = 0; intento < AUTH_PROFESOR_ATTEMPTS; intento++) {
 
-		if (existente != null) {
+			Long existente = authUsuarioClient.buscarIdPorEmail(demoProfesorEmail);
 
-			return existente;
+			if (existente != null) {
+
+				return existente;
+
+			}
+
+			try {
+
+				Map<String, Object> creado = authUsuarioClient.crearUsuario(
+
+						"Ana", "Pérez", demoProfesorEmail, demoProfesorPassword, "profesor");
+
+				if (creado != null && creado.get("id") != null) {
+
+					return ((Number) creado.get("id")).longValue();
+
+				}
+
+			} catch (RuntimeException ex) {
+
+				log.debug("Demo: intento {}/{} profesor en auth: {}", intento + 1, AUTH_PROFESOR_ATTEMPTS,
+
+						ex.getMessage());
+
+			}
+
+			existente = authUsuarioClient.buscarIdPorEmail(demoProfesorEmail);
+
+			if (existente != null) {
+
+				return existente;
+
+			}
+
+			if (intento + 1 < AUTH_PROFESOR_ATTEMPTS) {
+
+				dormir(AUTH_PROFESOR_WAIT_MS);
+
+			}
 
 		}
 
-		Map<String, Object> creado = authUsuarioClient.crearUsuario(
-
-				"Ana", "Pérez", demoProfesorEmail, demoProfesorPassword, "profesor");
-
-		if (creado != null && creado.get("id") != null) {
-
-			return ((Number) creado.get("id")).longValue();
-
-		}
-
-		return authUsuarioClient.buscarIdPorEmail(demoProfesorEmail);
+		return null;
 
 	}
 
