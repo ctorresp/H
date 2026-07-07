@@ -15,7 +15,7 @@ Usage:
      export POSTGRES_HOST=localhost
      export POSTGRES_PORT=5432
      export POSTGRES_USER=postgres
-     export POSTGRES_PASSWORD=postgres
+     export POSTGRES_PASSWORD=Benya120703.
      export POSTGRES_DB=db_usuarios
 
   3. Run:
@@ -194,8 +194,9 @@ def migrate() -> None:
     pg_host = get_env('POSTGRES_HOST', 'localhost')
     pg_port = int(get_env('POSTGRES_PORT', '5432'))
     pg_user = get_env('POSTGRES_USER', 'postgres')
-    pg_password = get_env('POSTGRES_PASSWORD', 'postgres')
+    pg_password = get_env('POSTGRES_PASSWORD', 'Benya120703')
     pg_database = get_env('POSTGRES_DB', mysql_database)
+    pg_sslmode = get_env('POSTGRES_SSLMODE', 'require')
 
     include_tables = parse_csv_list(get_env('TABLES'))
     skip_tables = parse_csv_list(get_env('SKIP_TABLES'))
@@ -216,6 +217,7 @@ def migrate() -> None:
         user=pg_user,
         password=pg_password,
         dbname=pg_database,
+        sslmode=pg_sslmode,
     )
 
     try:
