@@ -173,7 +173,7 @@ services:
       MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
       MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8056
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       admin-api:
         condition: service_healthy
