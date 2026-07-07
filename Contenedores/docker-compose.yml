@@ -30,7 +30,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
@@ -40,7 +40,7 @@ services:
       retries: 15
     volumes:
       - postgres-colegio-data:/var/lib/postgresql/data
-      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
     deploy:
       resources:
         limits:
@@ -63,7 +63,7 @@ services:
       SERVER_PORT: 8051
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_usuarios
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
       APP_ADMIN_ENABLED: "true"
@@ -98,7 +98,7 @@ services:
       SERVER_PORT: 8052
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_administracion
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       MS_AUTH_BASE_URL: http://auth-api:8051
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
@@ -132,13 +132,13 @@ services:
       SERVER_PORT: 8053
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_academico
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
       MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
       MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8056
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       admin-api:
         condition: service_healthy
@@ -167,13 +167,13 @@ services:
       SERVER_PORT: 8054
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_asistencia
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
       MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
       MS_MENSAJERIA_BASE_URL: http://mensajeria-api:8056
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       admin-api:
         condition: service_healthy
@@ -202,7 +202,7 @@ services:
       SERVER_PORT: 8055
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_conducta
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
       MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
@@ -242,7 +242,7 @@ services:
       SERVER_PORT: 8056
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_mensajeria
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-Benya120703.}
       JWT_SECRET: ${JWT_SECRET:-UnaClaveSuperSecretaYMuyLargaParaPoderFirmarElTokenCorrectamente12345}
       INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dev-internal-token}
       MS_ADMINISTRACION_BASE_URL: http://admin-api:8052
